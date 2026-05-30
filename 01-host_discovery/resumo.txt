@@ -1,0 +1,14 @@
+==================================================
+  01-host_discovery - Resumo da Auditoria
+  Data: 2026-05-28 15:44:44
+==================================================
+
+Alvo: 192.168.1.0
+Tipo de scan: arp
+Interface: wlp4s0
+Hosts descobertos: 0
+
+Arquivo de resultados: /home/teixrom/projetos/network_audit/audits/host_discovery_20260528_154444.txt
+
+---
+Log completo: /home/teixrom/projetos/network_audit/audits/01-host_discovery_20260528_154410.log
