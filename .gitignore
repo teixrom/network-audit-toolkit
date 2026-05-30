@@ -1,5 +1,6 @@
 audits/
 token
+resumo.txt
 *.log
 __pycache__/
 *.pyc
