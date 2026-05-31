@@ -50,32 +50,57 @@ Uma sessão nula ocorre quando uma conexão SMB é estabelecida sem credenciais.
 
 ---
 
+
+
 ## Testes com Laboratorio Virtual
 
 ### Alvo
-- IP: 10.99.0.11 (smb)
+- **Host Discovery:** 10.99.0.0/24 (rede do laboratorio)
+- **Demais modulos:** 10.99.0.10 (target container)
+- **Servidores auxiliares:** LDAP=10.99.0.12, DNS=10.99.0.13, SNMP=10.99.0.14
 
-### Recursos Utilizados
-- Ferramentas: nmap, smbclient, enum4linux
-
-### Procedimento e Resultados
-
-**Nota:** O container SMB apresentou falha de inicializacao no ambiente de teste (incompatibilidade com podman). O teste conceitual permanece valido.
+### Evidencia de Execucao do Modulo
 
 ```
-$ nmap -p 139,445 10.99.0.11
-
-Starting Nmap 7.80 ( https://nmap.org ) at 2026-05-31 10:15 -03
-Nmap scan report for 10.99.0.11
-Host is up (0.0010s latency).
-
-PORT    STATE  SERVICE
-139/tcp closed netbios-ssn
-445/tcp closed microsoft-ds
-
-Nmap done: 1 IP address (1 host up) scanned in 0.25s
+================================================
+  SMB Auditor
+  06-smb_audit
+================================================
+╔══════════════════════════════════════════════════════╗
+║  AVISO LEGAL - FERRAMENTA EDUCACIONAL              ║
+║                                                    ║
+║  Esta ferramenta é exclusivamente para FINS          ║
+║  EDUCACIONAIS e TESTES DE SEGURANÇA AUTORIZADOS.   ║
+║                                                    ║
+║  ⚠  O uso não autorizado em redes, sistemas ou     ║
+║     dispositivos dos quais você não é proprietário  ║
+║     ou não tem permissão explícita por escrito      ║
+║     para testar é ILEGAL e antiético.              ║
+║                                                    ║
+║  🛡  Use apenas em:                                ║
+║     • Redes próprias                               ║
+║     • Laboratórios de estudo                       ║
+║     • Testes com autorização por escrito           ║
+║                                                    ║
+║  O autor não se responsabiliza por qualquer uso       ║
+║  indevido ou danos causados por esta ferramenta.      ║
+╚══════════════════════════════════════════════════════╝
+  Ao continuar, você confirma que leu e entendeu este aviso.
+  Pressione ENTER para confirmar e continuar...[LOG] Dependencias OK
+================================================
+  PASSO 1: Digite o alvo
+================================================
+Alvo (IP ou hostname): [+] Alvo: 10.99.0.10
+================================================
+  PASSO 2: Verificação de portas (139, 445)
+================================================
+[*] Verificando portas SMB (139, 445)...
+  [-] Porta 139 está FECHADA
+  [-] Porta 445 está FECHADA
+[!] Nenhuma porta SMB aberta. Tentando scan SYN do nmap...
+[!] Portas SMB fechadas. Abortando auditoria SMB.
+[ERRO] SMB ports closed on 10.99.0.10
+[!] Limpando...
 ```
 
-**Resultados:**
-- Portas 139/445: Fechadas (container SMB nao iniciou devido a incompatibilidade com podman)
-- Teste conceitual: Valido — em ambiente com Samba funcional, as portas 139 e 445 devem estar abertas
+> Output capturado em 2026-05-31 13:40:43 - execucao automatizada via `lab/run_tests.sh`

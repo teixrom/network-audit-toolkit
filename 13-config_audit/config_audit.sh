@@ -102,9 +102,10 @@ load_config() {
     echo "  2) Informar caminho de um arquivo de configuração"
     echo ""
 
-    while true; do
+    local load_attempts=0
+    while [ $load_attempts -lt 10 ]; do
         echo -n "Selecione (1-2): "
-        read choice
+        read choice || true
         case "$choice" in
             1)
                 CONFIG_CONTENT="$SAMPLE_CONFIG"
@@ -113,9 +114,10 @@ load_config() {
                 break
                 ;;
             2)
-                while true; do
+                local path_attempts=0
+                while [ $path_attempts -lt 5 ]; do
                     echo -n "Caminho do arquivo: "
-                    read custom_path
+                    read custom_path || true
                     custom_path="${custom_path/#\~/$HOME}"
                     if [ -f "$custom_path" ] && [ -r "$custom_path" ]; then
                         CONFIG_CONTENT=$(cat "$custom_path")
@@ -125,9 +127,12 @@ load_config() {
                         break 2
                     fi
                     echo -e "${RED}Arquivo não encontrado ou não legível${RESET}"
+                    path_attempts=$((path_attempts + 1))
                 done
+                load_attempts=$((load_attempts + 1))
                 ;;
-            *) echo -e "${RED}Opção inválida${RESET}" ;;
+            *) echo -e "${RED}Opção inválida${RESET}"
+               load_attempts=$((load_attempts + 1)) ;;
         esac
     done
 }
@@ -339,9 +344,10 @@ save_report() {
     echo "  2) Pular"
     echo ""
 
-    while true; do
+    local sr_attempts=0
+    while [ $sr_attempts -lt 10 ]; do
         echo -n "Selecione (1-2): "
-        read choice
+        read choice || true
         case "$choice" in
             1)
                 local outfile="$AUDIT_DIR/config_audit_$(date +%Y%m%d_%H%M%S).txt"
@@ -387,7 +393,8 @@ save_report() {
                 echo -e "${YELLOW}[!] Pulando geração de relatório${RESET}"
                 break
                 ;;
-            *) echo -e "${RED}Opção inválida${RESET}" ;;
+            *) echo -e "${RED}Opção inválida${RESET}"
+               sr_attempts=$((sr_attempts + 1)) ;;
         esac
     done
 }

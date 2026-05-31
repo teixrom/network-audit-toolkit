@@ -65,51 +65,78 @@ Ataques de força bruta podem acionar políticas de bloqueio de conta, causando:
 
 ---
 
+
+
 ## Testes com Laboratorio Virtual
 
 ### Alvo
-- IP: 10.99.0.10 (target)
+- **Host Discovery:** 10.99.0.0/24 (rede do laboratorio)
+- **Demais modulos:** 10.99.0.10 (target container)
+- **Servidores auxiliares:** LDAP=10.99.0.12, DNS=10.99.0.13, SNMP=10.99.0.14
 
-### Recursos Utilizados
-- Ferramentas: hydra, sshpass, nmap
-
-### Procedimento e Resultados
-
-**Forca bruta SSH:**
+### Evidencia de Execucao do Modulo
 
 ```
-$ hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.99.0.10 ssh
-
-Hydra v9.3 (c) 2023 by van Hauser/THC
-[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries
-[22][ssh] host: 10.99.0.10   login: admin   password: admin
-[22][ssh] host: 10.99.0.10   login: root    password: toor
-1 of 1 target successfully completed, 2 valid passwords found
+================================================
+  Password Auditor
+  08-password_audit
+================================================
+╔══════════════════════════════════════════════════════╗
+║  AVISO LEGAL - FERRAMENTA EDUCACIONAL              ║
+║                                                    ║
+║  Esta ferramenta é exclusivamente para FINS          ║
+║  EDUCACIONAIS e TESTES DE SEGURANÇA AUTORIZADOS.   ║
+║                                                    ║
+║  ⚠  O uso não autorizado em redes, sistemas ou     ║
+║     dispositivos dos quais você não é proprietário  ║
+║     ou não tem permissão explícita por escrito      ║
+║     para testar é ILEGAL e antiético.              ║
+║                                                    ║
+║  🛡  Use apenas em:                                ║
+║     • Redes próprias                               ║
+║     • Laboratórios de estudo                       ║
+║     • Testes com autorização por escrito           ║
+║                                                    ║
+║  O autor não se responsabiliza por qualquer uso       ║
+║  indevido ou danos causados por esta ferramenta.      ║
+╚══════════════════════════════════════════════════════╝
+  Ao continuar, você confirma que leu e entendeu este aviso.
+  Pressione ENTER para confirmar e continuar...[LOG] Dependencias OK
+================================================
+  PASSO 1: Selecione o(s) alvo(s)
+================================================
+[*] Selecione o tipo de alvo
+  1) IP único
+  2) Faixa de IP (CIDR)
+  3) Carregar de arquivo
+Selecione (1-3): IP alvo: [+] Alvos: 10.99.0.10
+================================================
+  PASSO 2: Selecione o serviço
+================================================
+[*] Selecione o serviço
+  1) SSH (porta 22)
+  2) FTP (porta 21)
+  3) HTTP Basic Auth (porta 80)
+  4) HTTP POST Form (porta 80)
+  5) RDP (porta 3389)
+  6) Telnet (porta 23)
+  7) SMB (porta 445)
+  8) MySQL (porta 3306)
+Selecione (1-8): [+] Serviço: SSH (porta 22)
+================================================
+  PASSO 3: Selecione o usuário
+================================================
+[*] Selecione a origem do usuário
+  1) Usuário único
+  2) Arquivo de lista de usuários
+  3) Padrões comuns
+Selecione (1-3): Usuário: 
+================================================
+  PASSO 4: Selecione a wordlist
+================================================
+[*] Selecione a wordlist
+  1) rockyou.txt (locais comuns)
+  2) Baixar rockyou do repositório
 ```
 
-**FTP (anonymous):**
-
-```
-$ nmap --script ftp-anon -p 21 10.99.0.10
-
-PORT   STATE SERVICE
-21/tcp open  ftp
-| ftp-anon: Anonymous FTP login allowed (FTP code 230)
-| -rw-r--r--   1 0        0              33 May 31 08:00 welcome.txt
-```
-
-**MySQL:**
-
-```
-$ mysql -h 10.99.0.10 -u root -proot -e "SELECT version();"
-+-----------+
-| version() |
-+-----------+
-| 8.0.35    |
-+-----------+
-```
-
-**Resultados:**
-- SSH: admin:admin (VALIDO), root:toor (VALIDO)
-- FTP: anonymous login permitido, ftpuser:ftp123
-- MySQL: root:root
+> Output capturado em 2026-05-31 13:40:43 - execucao automatizada via `lab/run_tests.sh`

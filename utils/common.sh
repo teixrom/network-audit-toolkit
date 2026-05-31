@@ -17,6 +17,7 @@ mkdir -p "$AUDIT_DIR"
 LOG_FILE="$AUDIT_DIR/$(basename "$SCRIPT_DIR")_$(date +%Y%m%d_%H%M%S).log"
 RESUMO_FILE="$SCRIPT_DIR/resumo.txt"
 TEMP_FILES=()
+exec 3>&2
 exec 2>>"$LOG_FILE"
 
 cleanup_temp() {
@@ -103,22 +104,26 @@ run_cmd_with_progress() {
 
 confirm_action() {
     local prompt="$1"
-    echo ""
-    echo -e "${YELLOW}[*] $prompt${RESET}"
-    echo ""
-    echo "  1) Sim"
-    echo "  2) Não"
-    echo ""
+    echo "" >&3
+    echo -e "${YELLOW}[*] $prompt${RESET}" >&3
+    echo "" >&3
+    echo "  1) Sim" >&3
+    echo "  2) Não" >&3
+    echo "" >&3
 
-    while true; do
-        echo -n "Selecione (1-2): "
-        read choice
+    local attempts=0
+    while [ $attempts -lt 10 ]; do
+        echo -n "Selecione (1-2): " >&3
+        read choice || true
         case "$choice" in
             1) return 0 ;;
             2) return 1 ;;
-            *) echo -e "${RED}Opção inválida${RESET}" ;;
+            *) echo -e "${RED}Opção inválida${RESET}" >&3 ;;
         esac
+        attempts=$((attempts + 1))
     done
+    echo -e "${RED}[!] Numero maximo de tentativas excedido em confirm_action${RESET}" >&3
+    exit 1
 }
 
 save_results_file() {
@@ -128,11 +133,11 @@ save_results_file() {
     if confirm_action "Salvar resultados em arquivo?"; then
         local outfile="$AUDIT_DIR/${default_name}_$(date +%Y%m%d_%H%M%S).txt"
         echo "$content" > "$outfile"
-        echo -e "${GREEN}[+] Resultados salvos em: $outfile${RESET}"
+        echo -e "${GREEN}[+] Resultados salvos em: $outfile${RESET}" >&3
         log "Resultados exportados para $outfile"
         echo "$outfile"
     else
-        echo -e "${YELLOW}[!] Pulando salvamento${RESET}"
+        echo -e "${YELLOW}[!] Pulando salvamento${RESET}" >&3
         echo ""
     fi
 }
@@ -142,13 +147,14 @@ read_input() {
     local prompt="$1"; shift
     local default="${1:-}"
 
-    while true; do
+    local attempts=0
+    while [ $attempts -lt 10 ]; do
         if [ -n "$default" ]; then
             echo -n "$prompt [$default]: "
         else
             echo -n "$prompt: "
         fi
-        read input
+        read input || true
         if [ -n "$input" ]; then
             eval "$var_name=\$input"
             break
@@ -157,7 +163,12 @@ read_input() {
             break
         fi
         echo -e "${RED}O valor não pode ficar vazio${RESET}"
+        attempts=$((attempts + 1))
     done
+    if [ $attempts -ge 10 ]; then
+        echo -e "${RED}[!] Numero maximo de tentativas excedido em read_input${RESET}" >&3
+        exit 1
+    fi
 }
 
 select_from_list() {
@@ -165,23 +176,27 @@ select_from_list() {
     local items=("$@")
     local i
 
-    echo ""
-    echo -e "${YELLOW}[*] $prompt${RESET}"
-    echo ""
+    echo "" >&3
+    echo -e "${YELLOW}[*] $prompt${RESET}" >&3
+    echo "" >&3
     for i in "${!items[@]}"; do
-        echo "  $((i+1))) ${items[$i]}"
+        echo "  $((i+1))) ${items[$i]}" >&3
     done
-    echo ""
+    echo "" >&3
 
-    while true; do
-        echo -n "Selecione (1-${#items[@]}): "
-        read choice
+    local attempts=0
+    while [ $attempts -lt 10 ]; do
+        echo -n "Selecione (1-${#items[@]}): " >&3
+        read choice || true
         if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#items[@]}" ]; then
             echo "${items[$((choice-1))]}"
             return 0
         fi
-        echo -e "${RED}Opção inválida${RESET}"
+        echo -e "${RED}Opção inválida${RESET}" >&3
+        attempts=$((attempts + 1))
     done
+    echo -e "${RED}[!] Numero maximo de tentativas excedido em select_from_list${RESET}" >&3
+    exit 1
 }
 
 check_root() {

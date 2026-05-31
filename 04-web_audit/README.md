@@ -59,50 +59,78 @@ Relatório completo contendo:
 
 ---
 
+
+
 ## Testes com Laboratorio Virtual
 
 ### Alvo
-- URL: http://10.99.0.10
+- **Host Discovery:** 10.99.0.0/24 (rede do laboratorio)
+- **Demais modulos:** 10.99.0.10 (target container)
+- **Servidores auxiliares:** LDAP=10.99.0.12, DNS=10.99.0.13, SNMP=10.99.0.14
 
-### Recursos Utilizados
-- Ferramentas: curl, openssl s_client
-
-### Procedimento e Resultados
-
-**Security Headers (todos ausentes propositalmente):**
+### Evidencia de Execucao do Modulo
 
 ```
-$ curl -sI http://10.99.0.10 | grep -i -E "(strict-transport-security|x-frame-options|x-content-type-options|content-security-policy|referrer-policy)"
+================================================
+  Auditor Web
+  04-web_audit
+================================================
+╔══════════════════════════════════════════════════════╗
+║  AVISO LEGAL - FERRAMENTA EDUCACIONAL              ║
+║                                                    ║
+║  Esta ferramenta é exclusivamente para FINS          ║
+║  EDUCACIONAIS e TESTES DE SEGURANÇA AUTORIZADOS.   ║
+║                                                    ║
+║  ⚠  O uso não autorizado em redes, sistemas ou     ║
+║     dispositivos dos quais você não é proprietário  ║
+║     ou não tem permissão explícita por escrito      ║
+║     para testar é ILEGAL e antiético.              ║
+║                                                    ║
+║  🛡  Use apenas em:                                ║
+║     • Redes próprias                               ║
+║     • Laboratórios de estudo                       ║
+║     • Testes com autorização por escrito           ║
+║                                                    ║
+║  O autor não se responsabiliza por qualquer uso       ║
+║  indevido ou danos causados por esta ferramenta.      ║
+╚══════════════════════════════════════════════════════╝
+  Ao continuar, você confirma que leu e entendeu este aviso.
+  Pressione ENTER para confirmar e continuar...[LOG] Dependencias OK
+================================================
+  PASSO 1: Digite a URL alvo
+================================================
+URL alvo (ex: http://example.com, https://example.com:8443): [+] Alvo: http://10.99.0.10:10.99.0.10
+================================================
+  PASSO 2: Análise de cabeçalhos HTTP
+================================================
+[*] Obtendo cabeçalhos HTTP...
+[!] Falha ao obter cabeçalhos de http://10.99.0.10:10.99.0.10/
+[ERRO] Failed to fetch headers from http://10.99.0.10:10.99.0.10/
+================================================
+  PASSO 3: Detecção de tecnologias web
+================================================
+================================================
+  Detecção de Tecnologias Web
+================================================
+  [!] Nenhuma tecnologia específica detectada
+================================================
+  PASSO 4: Verificação SSL/TLS
+================================================
+[!] O alvo não é HTTPS, pulando verificação SSL
+================================================
+  PASSO 5: Descoberta de formulários
+================================================
+================================================
+  Descoberta de Formulários
+================================================
+[!] Não foi possível obter o corpo da página
+================================================
+  PASSO 6: Força bruta de diretórios
+================================================
+[*] Força bruta de diretórios/arquivos
+  Ferramenta: gobuster
+[*] Selecione a wordlist
+  1) Wordlist comum (/usr/share/wordlists/dirb/common.txt)
 ```
 
-Nenhum header de segurança foi encontrado — todos ausentes.
-
-**Certificado SSL (auto-assinado):**
-
-```
-$ openssl s_client -connect 10.99.0.10:443 -servername 10.99.0.10 </dev/null 2>/dev/null | openssl x509 -noout -text | head -20
-
-Certificate:
-    Data:
-        Version: 3 (0x2)
-        Serial Number: 0x1234567890abcdef
-        Signature Algorithm: sha256WithRSAEncryption
-        Issuer: CN = target.lab.local
-        Validity
-            Not Before: May 31 10:00:00 2026 GMT
-            Not After : May 31 10:00:00 2027 GMT
-        Subject: CN = target.lab.local
-```
-
-**Directory listing:**
-
-```
-$ curl -s -o /dev/null -w "%{http_code}" http://10.99.0.10/uploads/
-404
-```
-
-**Resultados:**
-- Security Headers: Todos ausentes (proposital para fins de laboratório)
-- Certificado SSL: Auto-assinado, CN=target.lab.local, válido por 1 ano
-- Tecnologias: Apache httpd
-- /uploads/: 404 (configurado mas sem conteúdo)
+> Output capturado em 2026-05-31 13:40:43 - execucao automatizada via `lab/run_tests.sh`

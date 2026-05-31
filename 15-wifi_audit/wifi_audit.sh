@@ -81,9 +81,10 @@ list_wifi_interfaces() {
         return
     fi
 
-    while true; do
+    local if_attempts=0
+    while [ $if_attempts -lt 10 ]; do
         echo -n "Selecione a interface (1-$((i - 1))): "
-        read choice
+        read choice || true
         if [ "$choice" -ge 1 ] && [ "$choice" -le "$((i - 1))" ] 2>/dev/null; then
             WIFI_INTERFACE="${iface_list[$((choice - 1))]}"
             echo -e "${GREEN}[+] Interface selecionada: $WIFI_INTERFACE${RESET}"
@@ -91,6 +92,7 @@ list_wifi_interfaces() {
             break
         fi
         echo -e "${RED}Opção inválida${RESET}"
+        if_attempts=$((if_attempts + 1))
     done
 }
 
@@ -100,7 +102,7 @@ ask_known_ssids() {
     echo -e "${YELLOW}    (Redes legítimas da sua organização)${RESET}"
     echo ""
     echo -n "Informe os SSIDs conhecidos separados por vírgula (ou Enter para pular): "
-    read input
+    read input || true
     if [ -n "$input" ]; then
         IFS=',' read -ra ssids <<< "$input"
         for ssid in "${ssids[@]}"; do
@@ -290,9 +292,10 @@ save_report() {
     echo "  2) Pular"
     echo ""
 
-    while true; do
+    local sr_attempts=0
+    while [ $sr_attempts -lt 10 ]; do
         echo -n "Selecione (1-2): "
-        read choice
+        read choice || true
         case "$choice" in
             1)
                 local outfile="$AUDIT_DIR/wifi_audit_$(date +%Y%m%d_%H%M%S).txt"
@@ -322,7 +325,8 @@ save_report() {
                 echo -e "${YELLOW}[!] Pulando geração de relatório${RESET}"
                 break
                 ;;
-            *) echo -e "${RED}Opção inválida${RESET}" ;;
+            *) echo -e "${RED}Opção inválida${RESET}"
+               sr_attempts=$((sr_attempts + 1)) ;;
         esac
     done
 }

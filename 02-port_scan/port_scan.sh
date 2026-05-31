@@ -66,15 +66,16 @@ select_scan_type() {
     )
     local choice
     choice=$(select_from_list "Selecione o tipo de varredura" "${types[@]}")
-    case "${choice:0:1}" in
-        1) SCAN_TYPE="quick" ;;
-        2) SCAN_TYPE="standard" ;;
-        3) SCAN_TYPE="full" ;;
-        4)
-            SCAN_TYPE="custom"
-            read_input CUSTOM_PORTS "Intervalo de portas (ex.: 1-1024 ou 80,443,8080)"
-            ;;
-    esac
+    if [ "$choice" = "${types[0]}" ]; then
+        SCAN_TYPE="quick"
+    elif [ "$choice" = "${types[1]}" ]; then
+        SCAN_TYPE="standard"
+    elif [ "$choice" = "${types[2]}" ]; then
+        SCAN_TYPE="full"
+    elif [ "$choice" = "${types[3]}" ]; then
+        SCAN_TYPE="custom"
+        read_input CUSTOM_PORTS "Intervalo de portas (ex.: 1-1024 ou 80,443,8080)"
+    fi
     echo -e "${GREEN}[+] Tipo de varredura: $SCAN_TYPE${RESET}"
 }
 
@@ -86,11 +87,13 @@ select_scan_technique() {
     )
     local choice
     choice=$(select_from_list "Selecione a técnica de varredura" "${types[@]}")
-    case "${choice:0:1}" in
-        1) SCAN_TECHNIQUE="-sT" ;;
-        2) SCAN_TECHNIQUE="-sS" ;;
-        3) SCAN_TECHNIQUE="-sU" ;;
-    esac
+    if [ "$choice" = "${types[0]}" ]; then
+        SCAN_TECHNIQUE="-sT"
+    elif [ "$choice" = "${types[1]}" ]; then
+        SCAN_TECHNIQUE="-sS"
+    elif [ "$choice" = "${types[2]}" ]; then
+        SCAN_TECHNIQUE="-sU"
+    fi
     echo -e "${GREEN}[+] Técnica: $SCAN_TECHNIQUE${RESET}"
 }
 

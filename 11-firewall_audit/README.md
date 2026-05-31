@@ -70,26 +70,78 @@ Relatório completo contendo:
 
 ---
 
+
+
 ## Testes com Laboratorio Virtual
 
 ### Alvo
-- IP: 10.99.0.10 (target)
+- **Host Discovery:** 10.99.0.0/24 (rede do laboratorio)
+- **Demais modulos:** 10.99.0.10 (target container)
+- **Servidores auxiliares:** LDAP=10.99.0.12, DNS=10.99.0.13, SNMP=10.99.0.14
 
-### Recursos Utilizados
-- Ferramentas: nmap -sA, -sF, -sN, -sX; iptables; hping3
-
-### Procedimento e Resultados
-```
-nmap -sA 10.99.0.10
-```
-22/unfiltered, 80/unfiltered, 443/unfiltered (stateless)
+### Evidencia de Execucao do Modulo
 
 ```
-nmap -sF 10.99.0.10
+================================================
+  Firewall Auditor
+  11-firewall_audit
+================================================
+╔══════════════════════════════════════════════════════╗
+║  AVISO LEGAL - FERRAMENTA EDUCACIONAL              ║
+║                                                    ║
+║  Esta ferramenta é exclusivamente para FINS          ║
+║  EDUCACIONAIS e TESTES DE SEGURANÇA AUTORIZADOS.   ║
+║                                                    ║
+║  ⚠  O uso não autorizado em redes, sistemas ou     ║
+║     dispositivos dos quais você não é proprietário  ║
+║     ou não tem permissão explícita por escrito      ║
+║     para testar é ILEGAL e antiético.              ║
+║                                                    ║
+║  🛡  Use apenas em:                                ║
+║     • Redes próprias                               ║
+║     • Laboratórios de estudo                       ║
+║     • Testes com autorização por escrito           ║
+║                                                    ║
+║  O autor não se responsabiliza por qualquer uso       ║
+║  indevido ou danos causados por esta ferramenta.      ║
+╚══════════════════════════════════════════════════════╝
+  Ao continuar, você confirma que leu e entendeu este aviso.
+  Pressione ENTER para confirmar e continuar...[LOG] Dependencias OK
+================================================
+  PASSO 1: Selecionar alvo
+================================================
+IP do alvo: [+] Alvo: 1
+================================================
+  PASSO 2: Escolha o tipo de auditoria
+================================================
+[*] Selecione o tipo de auditoria:
+  1) Análise local de regras de firewall (iptables)
+  2) Detecção remota de firewall (nmap)
+Selecione (1-2): Opção inválida
+Selecione (1-2): [+] Tipo de auditoria: 2
+================================================
+  PASSO 3: Detecção remota de firewall
+================================================
+[*] Executando varreduras de detecção de firewall em 1...
+--- Varredura TCP ACK (detecta filtragem stateful) ---
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-05-31 13:39 -03
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+Nmap done: 1 IP address (0 hosts up) scanned in 2.06 seconds
+  [+] Todas as portas filtradas - firewall stateful detectado
+--- Varredura TCP FIN ---
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-05-31 13:39 -03
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+Nmap done: 1 IP address (0 hosts up) scanned in 2.06 seconds
+--- Varredura TCP NULL ---
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-05-31 13:39 -03
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+Nmap done: 1 IP address (0 hosts up) scanned in 2.06 seconds
+--- Varredura TCP XMAS ---
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-05-31 13:39 -03
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+Nmap done: 1 IP address (0 hosts up) scanned in 2.06 seconds
+--- Varredura UDP (top 50 portas) ---
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-05-31 13:39 -03
 ```
-open|filtered (inconsistent - suggests stateful inspection)
 
-```
-iptables -L -n
-```
-Policy ACCEPT on all chains (no firewall rules)
+> Output capturado em 2026-05-31 13:40:43 - execucao automatizada via `lab/run_tests.sh`

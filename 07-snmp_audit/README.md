@@ -48,34 +48,78 @@ MIB (Management Information Base) walks recuperam dados hierárquicos de disposi
 
 ---
 
+
+
 ## Testes com Laboratorio Virtual
 
 ### Alvo
-- IP: 10.99.0.14 (snmp)
+- **Host Discovery:** 10.99.0.0/24 (rede do laboratorio)
+- **Demais modulos:** 10.99.0.10 (target container)
+- **Servidores auxiliares:** LDAP=10.99.0.12, DNS=10.99.0.13, SNMP=10.99.0.14
 
-### Recursos Utilizados
-- Ferramentas: snmpwalk, nmap, snmpget
-
-### Procedimento e Resultados
-
-```
-$ snmpwalk -v 2c -c public 10.99.0.14 system
-
-SNMPv2-MIB::sysDescr.0 = STRING: Linux snmp.lab.local 6.17.0-1-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.17.0-1 (2026-05-23) x86_64
-SNMPv2-MIB::sysObjectID.0 = OID: NET-SNMP-MIB::netSnmpAgentOIDs.10
-SNMPv2-MIB::sysUpTime.0 = Timeticks: (123456) 0:20:34.56
-SNMPv2-MIB::sysContact.0 = STRING: admin@lab.local
-SNMPv2-MIB::sysName.0 = STRING: snmp.lab.local
-SNMPv2-MIB::sysLocation.0 = STRING: Virtual Lab
-SNMPv2-MIB::sysServices.0 = INTEGER: 72
-```
+### Evidencia de Execucao do Modulo
 
 ```
-$ snmpget -v 2c -c public 10.99.0.14 sysName.0
-SNMPv2-MIB::sysName.0 = STRING: snmp.lab.local
+================================================
+  SNMP Auditor
+  07-snmp_audit
+================================================
+╔══════════════════════════════════════════════════════╗
+║  AVISO LEGAL - FERRAMENTA EDUCACIONAL              ║
+║                                                    ║
+║  Esta ferramenta é exclusivamente para FINS          ║
+║  EDUCACIONAIS e TESTES DE SEGURANÇA AUTORIZADOS.   ║
+║                                                    ║
+║  ⚠  O uso não autorizado em redes, sistemas ou     ║
+║     dispositivos dos quais você não é proprietário  ║
+║     ou não tem permissão explícita por escrito      ║
+║     para testar é ILEGAL e antiético.              ║
+║                                                    ║
+║  🛡  Use apenas em:                                ║
+║     • Redes próprias                               ║
+║     • Laboratórios de estudo                       ║
+║     • Testes com autorização por escrito           ║
+║                                                    ║
+║  O autor não se responsabiliza por qualquer uso       ║
+║  indevido ou danos causados por esta ferramenta.      ║
+╚══════════════════════════════════════════════════════╝
+  Ao continuar, você confirma que leu e entendeu este aviso.
+  Pressione ENTER para confirmar e continuar...[LOG] Dependencias OK
+================================================
+  PASSO 1: Digite o alvo
+================================================
+Alvo (IP ou hostname): [+] Alvo: 10.99.0.14
+================================================
+  PASSO 2: Verificação da porta UDP 161
+================================================
+[*] Verificando porta UDP 161 (SNMP)...
+  [+] Porta UDP 161 está ABERTA
+================================================
+  PASSO 3: Descoberta de string de comunidade
+================================================
+[*] Testando strings de comunidade SNMP comuns...
+  [+] String de comunidade encontrada: public
+================================================
+  PASSO 4: Detecção de versão SNMP
+================================================
+[*] Detectando suporte a versão SNMP...
+  [+] Versões SNMP suportadas: v1 v2c 
+================================================
+  PASSO 5: MIB walk e coleta de dados
+================================================
+================================================
+  Informações Descobertas via SNMP
+================================================
+[*] MIB Walk - Informações do Sistema
+----------------------------------------
+  [+] Descrição do Sistema: "Linux snmp.lab.local 6.17.0-1023-oem #23-Ubuntu SMP PREEMPT_DYNAMIC Fri May  8 06:02:38 UTC 2026 x86_64"
+  [+] Nome do Sistema: "snmp.lab.local"
+  [+] Localização do Sistema: "Unknown (edit /etc/snmp/snmpd.conf)"
+  [+] Contato do Sistema: "Root <root@localhost> (configure /etc/snmp/snmp.local.conf)"
+  [+] Tempo de Atividade do Sistema: 0:1:21:27.62
+  [+] Serviços do Sistema: No Such Instance currently exists at this OID
+[*] MIB Walk - Interfaces de Rede
+----------------------------------------
 ```
 
-**Resultados:**
-- Community string "public": ACESSIVEL (read-only)
-- Sistema: Linux snmp.lab.local, kernel 6.17.0
-- Hostname: snmp.lab.local
+> Output capturado em 2026-05-31 13:40:43 - execucao automatizada via `lab/run_tests.sh`

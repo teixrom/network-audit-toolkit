@@ -55,46 +55,78 @@ Tabela com porta, serviço detectado e informações do banner. Resultados podem
 
 ---
 
+
+
 ## Testes com Laboratorio Virtual
 
 ### Alvo
-- IP: 10.99.0.10 (target)
+- **Host Discovery:** 10.99.0.0/24 (rede do laboratorio)
+- **Demais modulos:** 10.99.0.10 (target container)
+- **Servidores auxiliares:** LDAP=10.99.0.12, DNS=10.99.0.13, SNMP=10.99.0.14
 
-### Recursos Utilizados
-- Ferramentas: nmap -sV, netcat, curl
-
-### Procedimento e Resultados
-
-```
-$ nmap -sV -p 22,80,443,21,3306 10.99.0.10
-
-Starting Nmap 7.80 ( https://nmap.org ) at 2026-05-31 10:10 -03
-Nmap scan report for 10.99.0.10
-Host is up (0.0008s latency).
-
-PORT     STATE SERVICE     VERSION
-21/tcp   open  ftp         vsftpd 3.0.3
-22/tcp   open  ssh         OpenSSH 8.4p1 Debian 5+deb11u7 (protocol 2.0)
-80/tcp   open  http        Apache httpd 2.4.67
-443/tcp  open  ssl/http    Apache httpd 2.4.67
-3306/tcp open  mysql       MySQL 8.0.35
-
-Service Info: Host: target.lab.local; OS: Linux; CPE: cpe:/o:linux:linux_kernel
-```
-
-**Banner Grabbing:**
+### Evidencia de Execucao do Modulo
 
 ```
-$ nc -nv 10.99.0.10 22
-(UNKNOWN) [10.99.0.10] 22 (ssh) open
-SSH-2.0-OpenSSH_8.4p1 Debian-5+deb11u7
-
-$ curl -sI http://10.99.0.10 | grep -i server
-Server: Apache/2.4.67 (Debian)
+================================================
+  Enumeração de Serviços
+  03-service_enum
+================================================
+╔══════════════════════════════════════════════════════╗
+║  AVISO LEGAL - FERRAMENTA EDUCACIONAL              ║
+║                                                    ║
+║  Esta ferramenta é exclusivamente para FINS          ║
+║  EDUCACIONAIS e TESTES DE SEGURANÇA AUTORIZADOS.   ║
+║                                                    ║
+║  ⚠  O uso não autorizado em redes, sistemas ou     ║
+║     dispositivos dos quais você não é proprietário  ║
+║     ou não tem permissão explícita por escrito      ║
+║     para testar é ILEGAL e antiético.              ║
+║                                                    ║
+║  🛡  Use apenas em:                                ║
+║     • Redes próprias                               ║
+║     • Laboratórios de estudo                       ║
+║     • Testes com autorização por escrito           ║
+║                                                    ║
+║  O autor não se responsabiliza por qualquer uso       ║
+║  indevido ou danos causados por esta ferramenta.      ║
+╚══════════════════════════════════════════════════════╝
+  Ao continuar, você confirma que leu e entendeu este aviso.
+  Pressione ENTER para confirmar e continuar...[LOG] Dependencias OK
+================================================
+  PASSO 1: Digite o alvo
+================================================
+[*] Selecione a origem do alvo
+  1) Digitar alvo manualmente
+Selecione (1-1): IP/hostname alvo: [+] Alvo: 10.99.0.10
+================================================
+  PASSO 2: Digite as portas para enumerar
+================================================
+Portas (ex: 21,22,80,443 ou 1-1024): [+] Portas: 22,80,443,21
+================================================
+  PASSO 3: Executando enumeração
+================================================
+[*] Iniciando enumeração de serviços...
+================================================
+  PASSO 4: Exibir resultados
+================================================
+================================================
+  Resultados da Enumeração de Serviços para 10.99.0.10
+================================================
+PORTA    SERVIÇO       DETALHES                      
+------------------------------------------------------------------------
+22       SSH            SSH version: SSH-2.0-OpenSSH_8.4p1
+80       HTTP           Server: Apache | Title: Apache2 Debian Default Page: It works
+443      HTTPS          Server: Apache               
+21       FTP            FTP service detected | Anonymous login: disabled
+================================================
+  PASSO 5: Detecção de versão com nmap
+================================================
+[*] Executar nmap -sV para detecção detalhada de versão?
+  1) Sim
+  2) Não
+Selecione (1-2): [!] Pulando varredura de versão do nmap
+================================================
+  PASSO 6: Salvar resultados
 ```
 
-**Resultados:**
-- FTP: vsftpd 3.0.3
-- SSH: OpenSSH 8.4p1 Debian-5+deb11u7
-- HTTP: Apache httpd 2.4.67 (Debian)
-- MySQL: MySQL 8.0.35
+> Output capturado em 2026-05-31 13:40:43 - execucao automatizada via `lab/run_tests.sh`

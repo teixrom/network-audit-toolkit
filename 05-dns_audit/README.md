@@ -42,52 +42,78 @@ A descoberta de subdomínios tenta encontrar entradas DNS que podem expor superf
 
 ---
 
+
+
 ## Testes com Laboratorio Virtual
 
 ### Alvo
-- IP: 10.99.0.13 (DNS server)
-- Domínio: lab.local
+- **Host Discovery:** 10.99.0.0/24 (rede do laboratorio)
+- **Demais modulos:** 10.99.0.10 (target container)
+- **Servidores auxiliares:** LDAP=10.99.0.12, DNS=10.99.0.13, SNMP=10.99.0.14
 
-### Recursos Utilizados
-- Ferramentas: dig, nslookup, host
-
-### Procedimento e Resultados
-
-**Transferencia de Zona (AXFR):**
+### Evidencia de Execucao do Modulo
 
 ```
-$ dig axfr lab.local @10.99.0.13
-
-; <<>> DiG 9.18.28 <<>> axfr lab.local @10.99.0.13
-;; global options: +cmd
-lab.local.              3600    IN      SOA     dns.lab.local. admin.lab.local. 2026053101 3600 900 86400 3600
-lab.local.              3600    IN      NS      dns.lab.local.
-dns.lab.local.          3600    IN      A       10.99.0.13
-ldap.lab.local.         3600    IN      A       10.99.0.12
-smb.lab.local.          3600    IN      A       10.99.0.11
-snmp.lab.local.         3600    IN      A       10.99.0.14
-target.lab.local.       3600    IN      A       10.99.0.10
-_ldap._tcp.lab.local.   3600    IN      SRV     0 100 389 ldap.lab.local.
-_kerberos._tcp.lab.local. 3600  IN      SRV     0 100 88  ldap.lab.local.
-lab.local.              3600    IN      SOA     dns.lab.local. admin.lab.local. 2026053101 3600 900 86400 3600
+================================================
+  DNS Auditor
+  05-dns_audit
+================================================
+╔══════════════════════════════════════════════════════╗
+║  AVISO LEGAL - FERRAMENTA EDUCACIONAL              ║
+║                                                    ║
+║  Esta ferramenta é exclusivamente para FINS          ║
+║  EDUCACIONAIS e TESTES DE SEGURANÇA AUTORIZADOS.   ║
+║                                                    ║
+║  ⚠  O uso não autorizado em redes, sistemas ou     ║
+║     dispositivos dos quais você não é proprietário  ║
+║     ou não tem permissão explícita por escrito      ║
+║     para testar é ILEGAL e antiético.              ║
+║                                                    ║
+║  🛡  Use apenas em:                                ║
+║     • Redes próprias                               ║
+║     • Laboratórios de estudo                       ║
+║     • Testes com autorização por escrito           ║
+║                                                    ║
+║  O autor não se responsabiliza por qualquer uso       ║
+║  indevido ou danos causados por esta ferramenta.      ║
+╚══════════════════════════════════════════════════════╝
+  Ao continuar, você confirma que leu e entendeu este aviso.
+  Pressione ENTER para confirmar e continuar...[LOG] Dependencias OK
+================================================
+  PASSO 1: Digite o domínio alvo
+================================================
+Domínio alvo (ex: example.com): [+] Domínio: lab.local
+================================================
+  PASSO 2: Selecione o servidor DNS
+================================================
+[*] Usar servidor DNS personalizado?
+  1) Sim
+  2) Não
+Selecione (1-2): Opção inválida
+Selecione (1-2): Opção inválida
+Selecione (1-2): [+] Usando resolvedor DNS padrão do sistema
+================================================
+  PASSO 3: Selecione os tipos de registro
+================================================
+[*] Selecione o tipo de registro
+  1) A (IPv4 address)
+  2) AAAA (IPv6 address)
+  3) MX (Mail exchange)
+  4) NS (Nameservers)
+  5) TXT (Text records)
+  6) SOA (Start of authority)
+  7) CNAME (Canonical name)
+  8) TODOS (consultar todos)
+Selecione (1-8): [+] Record types: AAAA
+================================================
+  PASSO 4: Enumerar registros DNS
+================================================
+[*] Enumerando registros DNS para lab.local...
+--- AAAA Records ---
+[!] Nenhum registro AAAA encontrado
+================================================
+  PASSO 5: Verificação de transferência de zona
+================================================
 ```
 
-**VULNERAVEL** — Transferencia de zona completa liberada.
-
-**Reverse DNS:**
-
-```
-$ dig -x 10.99.0.10 @10.99.0.13 +short
-target.lab.local.
-
-$ dig -x 10.99.0.11 @10.99.0.13 +short
-smb.lab.local.
-
-$ dig -x 10.99.0.12 @10.99.0.13 +short
-ldap.lab.local.
-```
-
-**Resultados:**
-- Zone Transfer (AXFR): VULNERAVEL — zona completa disponivel sem restricao
-- Registros encontrados: SOA, NS, A (dns, ldap, smb, snmp, target), SRV (_ldap, _kerberos)
-- Reverse DNS: target.lab.local, smb.lab.local, ldap.lab.local
+> Output capturado em 2026-05-31 13:40:43 - execucao automatizada via `lab/run_tests.sh`

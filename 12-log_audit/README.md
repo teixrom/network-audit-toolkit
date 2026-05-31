@@ -81,21 +81,78 @@ Relatório completo contendo:
 
 ---
 
+
+
 ## Testes com Laboratorio Virtual
 
 ### Alvo
-- Container: nat-target
+- **Host Discovery:** 10.99.0.0/24 (rede do laboratorio)
+- **Demais modulos:** 10.99.0.10 (target container)
+- **Servidores auxiliares:** LDAP=10.99.0.12, DNS=10.99.0.13, SNMP=10.99.0.14
 
-### Recursos Utilizados
-- Ferramentas: journalctl, grep, awk, ss/netstat
+### Evidencia de Execucao do Modulo
 
-### Procedimento e Resultados
-Logs analyzed:
-- /var/log/dpkg.log (48109 bytes)
-- /var/log/alternatives.log (4243 bytes)
-- /var/log/vsftpd.log (empty)
+```
+================================================
+  Log Auditor
+  12-log_audit
+================================================
+╔══════════════════════════════════════════════════════╗
+║  AVISO LEGAL - FERRAMENTA EDUCACIONAL              ║
+║                                                    ║
+║  Esta ferramenta é exclusivamente para FINS          ║
+║  EDUCACIONAIS e TESTES DE SEGURANÇA AUTORIZADOS.   ║
+║                                                    ║
+║  ⚠  O uso não autorizado em redes, sistemas ou     ║
+║     dispositivos dos quais você não é proprietário  ║
+║     ou não tem permissão explícita por escrito      ║
+║     para testar é ILEGAL e antiético.              ║
+║                                                    ║
+║  🛡  Use apenas em:                                ║
+║     • Redes próprias                               ║
+║     • Laboratórios de estudo                       ║
+║     • Testes com autorização por escrito           ║
+║                                                    ║
+║  O autor não se responsabiliza por qualquer uso       ║
+║  indevido ou danos causados por esta ferramenta.      ║
+╚══════════════════════════════════════════════════════╝
+  Ao continuar, você confirma que leu e entendeu este aviso.
+  Pressione ENTER para confirmar e continuar...
+================================================
+  PASSO 1: Selecione a fonte de log
+================================================
+[*] Escolha a fonte de log:
+  1) Log do sistema (/var/log/syslog ou journalctl)
+  2) Log de autenticação (/var/log/auth.log ou journalctl -u ssh)
+  3) Log de acesso do servidor web (Apache/Nginx)
+  4) Caminho personalizado de arquivo de log
+Selecione (1-4): [+] Fonte: Log do sistema
+================================================
+  PASSO 2: Selecione o tipo de análise
+================================================
+[*] Escolha a análise:
+  1) Tentativas de login falhas
+  2) Endereços IP suspeitos
+  3) Eventos de falha/reinicialização de serviços
+  4) Histórico de conexões de rede
+  5) Todas as anteriores
+Selecione (1-5): [+] Tipo de análise: 5
+================================================
+  PASSO 3: Executando análise
+================================================
+================================================
+  Análise de Logins Falhos
+================================================
+--- Tentativas SSH Falhas ---
+  [+] Nenhuma tentativa de login SSH falha encontrada
+--- Tentativas sudo/su ---
+  [+] Nenhuma falha sudo/su encontrada
+================================================
+  Análise de Endereços IP Suspeitos
+================================================
+Contagem   IP               Risco
+----------------------------------------
+31         0.0.0.0          MÉDIO
+```
 
-No auth.log available (container sem syslog)
-
-### Observacao
-Em ambiente real com syslog, auth.log conteria tentativas de login
+> Output capturado em 2026-05-31 13:40:43 - execucao automatizada via `lab/run_tests.sh`

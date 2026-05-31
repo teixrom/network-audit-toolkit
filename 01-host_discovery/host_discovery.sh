@@ -48,11 +48,13 @@ select_scan_type() {
     )
     local choice
     choice=$(select_from_list "Selecione o tipo de varredura" "${types[@]}")
-    case "${choice:0:1}" in
-        1) SCAN_TYPE="arp" ;;
-        2) SCAN_TYPE="icmp" ;;
-        3) SCAN_TYPE="tcp" ;;
-    esac
+    if [ "$choice" = "${types[0]}" ]; then
+        SCAN_TYPE="arp"
+    elif [ "$choice" = "${types[1]}" ]; then
+        SCAN_TYPE="icmp"
+    elif [ "$choice" = "${types[2]}" ]; then
+        SCAN_TYPE="tcp"
+    fi
     echo -e "${GREEN}[+] Tipo de varredura: $SCAN_TYPE${RESET}"
 }
 

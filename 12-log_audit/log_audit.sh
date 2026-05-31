@@ -64,9 +64,10 @@ select_log_source() {
     echo "  4) Caminho personalizado de arquivo de log"
     echo ""
 
-    while true; do
+    local src_attempts=0
+    while [ $src_attempts -lt 10 ]; do
         echo -n "Selecione (1-4): "
-        read LOG_SOURCE
+        read LOG_SOURCE || true
         case "$LOG_SOURCE" in
             1)
                 if [ -f /var/log/syslog ] && [ -r /var/log/syslog ]; then
@@ -78,6 +79,7 @@ select_log_source() {
                 fi
                 if [ -z "$LOG_PATH" ] && [ -z "$SYSLOG_CMD" ]; then
                     echo -e "${RED}[!] Log do sistema não acessível${RESET}"
+                    src_attempts=$((src_attempts + 1))
                     continue
                 fi
                 echo -e "${GREEN}[+] Fonte: Log do sistema${RESET}"
@@ -90,6 +92,7 @@ select_log_source() {
                     SYSLOG_CMD="journalctl --no-pager -u ssh -n 5000"
                 else
                     echo -e "${RED}[!] Log de autenticação não acessível${RESET}"
+                    src_attempts=$((src_attempts + 1))
                     continue
                 fi
                 echo -e "${GREEN}[+] Fonte: Log de autenticação${RESET}"
@@ -108,14 +111,16 @@ select_log_source() {
                 if ! $found; then
                     echo -e "${RED}[!] Nenhum log de servidor web encontrado nos locais padrão${RESET}"
                     echo -e "${YELLOW}[*] Use a opção 4 para especificar um caminho personalizado${RESET}"
+                    src_attempts=$((src_attempts + 1))
                     continue
                 fi
                 break
                 ;;
             4)
-                while true; do
+                local path_attempts=0
+                while [ $path_attempts -lt 5 ]; do
                     echo -n "Caminho do arquivo de log: "
-                    read custom_path
+                    read custom_path || true
                     custom_path="${custom_path/#\~/$HOME}"
                     if [ -f "$custom_path" ] && ([ -r "$custom_path" ] || $HAS_SUDO); then
                         LOG_PATH="$custom_path"
@@ -123,9 +128,12 @@ select_log_source() {
                         break 2
                     fi
                     echo -e "${RED}Arquivo não encontrado ou não legível${RESET}"
+                    path_attempts=$((path_attempts + 1))
                 done
+                src_attempts=$((src_attempts + 1))
                 ;;
-            *) echo -e "${RED}Opção inválida${RESET}" ;;
+            *) echo -e "${RED}Opção inválida${RESET}"
+               src_attempts=$((src_attempts + 1)) ;;
         esac
     done
 }
@@ -142,12 +150,14 @@ select_analysis_type() {
     echo "  5) Todas as anteriores"
     echo ""
 
-    while true; do
+    local at_attempts=0
+    while [ $at_attempts -lt 10 ]; do
         echo -n "Selecione (1-5): "
-        read ANALYSIS_TYPE
+        read ANALYSIS_TYPE || true
         case "$ANALYSIS_TYPE" in
             1|2|3|4|5) break ;;
-            *) echo -e "${RED}Opção inválida${RESET}" ;;
+            *) echo -e "${RED}Opção inválida${RESET}"
+               at_attempts=$((at_attempts + 1)) ;;
         esac
     done
 
@@ -403,9 +413,10 @@ generate_security_summary() {
     echo "  2) Pular"
     echo ""
 
-    while true; do
+    local report_attempts=0
+    while [ $report_attempts -lt 10 ]; do
         echo -n "Selecione (1-2): "
-        read choice
+        read choice || true
         case "$choice" in
             1)
                 local outfile="$AUDIT_DIR/log_audit_$(date +%Y%m%d_%H%M%S).txt"
@@ -436,7 +447,8 @@ generate_security_summary() {
                 echo -e "${YELLOW}[!] Pulando geração de relatório${RESET}"
                 break
                 ;;
-            *) echo -e "${RED}Opção inválida${RESET}" ;;
+            *) echo -e "${RED}Opção inválida${RESET}"
+               report_attempts=$((report_attempts + 1)) ;;
         esac
     done
 }

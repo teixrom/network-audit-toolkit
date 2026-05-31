@@ -59,16 +59,23 @@ select_record_types() {
     )
     local choice
     choice=$(select_from_list "Selecione o tipo de registro" "${types[@]}")
-    case "${choice:0:1}" in
-        1) RECORD_TYPES=("A") ;;
-        2) RECORD_TYPES=("AAAA") ;;
-        3) RECORD_TYPES=("MX") ;;
-        4) RECORD_TYPES=("NS") ;;
-        5) RECORD_TYPES=("TXT") ;;
-        6) RECORD_TYPES=("SOA") ;;
-        7) RECORD_TYPES=("CNAME") ;;
-        8) RECORD_TYPES=("A" "AAAA" "MX" "NS" "TXT" "SOA" "CNAME") ;;
-    esac
+    if [ "$choice" = "${types[0]}" ]; then
+        RECORD_TYPES=("A")
+    elif [ "$choice" = "${types[1]}" ]; then
+        RECORD_TYPES=("AAAA")
+    elif [ "$choice" = "${types[2]}" ]; then
+        RECORD_TYPES=("MX")
+    elif [ "$choice" = "${types[3]}" ]; then
+        RECORD_TYPES=("NS")
+    elif [ "$choice" = "${types[4]}" ]; then
+        RECORD_TYPES=("TXT")
+    elif [ "$choice" = "${types[5]}" ]; then
+        RECORD_TYPES=("SOA")
+    elif [ "$choice" = "${types[6]}" ]; then
+        RECORD_TYPES=("CNAME")
+    elif [ "$choice" = "${types[7]}" ]; then
+        RECORD_TYPES=("A" "AAAA" "MX" "NS" "TXT" "SOA" "CNAME")
+    fi
     echo -e "${GREEN}[+] Record types: ${RECORD_TYPES[*]}${RESET}"
 }
 
