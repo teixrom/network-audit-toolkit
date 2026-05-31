@@ -1000,63 +1000,79 @@ def gerar():
     pdf.secao("18", "Relatorio Consolidado de Testes")
     pdf.corpo(
         "Os resultados abaixo foram obtidos executando cada modulo contra o "
-        "laboratorio virtual (rede 10.99.0.0/24) com 5 containers Docker "
-        "simulando servidores reais."
+        "laboratorio virtual (rede 10.99.0.0/24) com 5 containers "
+        "simulando servidores reais.\n\n"
+        "A automacao dos testes e feita via:\n"
+        "  lab/run_tests.sh    -> executa os 17 modulos com inputs em pipe\n"
+        "  lab/update_readmes.sh -> insere output real nos READMEs\n\n"
+        "Output completo de cada modulo disponivel em:\n"
+        "  XX-modulo/README.md (secao 'Testes com Laboratorio Virtual')"
     )
     pdf.subsecao("Sumario dos Resultados")
     pdf.tabela(
-        ["Modulo", "Alvo", "Resultado", "Vulnerabilidade"],
+        ["Modulo", "Alvo", "Resultado", "Status"],
         [
-            ["01 Host Discovery", "10.99.0.0/24", "6 hosts encontrados", "N/A"],
-            ["02 Port Scan", "10.99.0.10", "4 portas abertas (21,22,80,443)", "N/A"],
-            ["03 Service Enum", "10.99.0.10", "vsftpd, OpenSSH 8.4, Apache 2.4", "FTP anonimo permitido"],
-            ["04 Web Audit", "10.99.0.10", "0 headers de seguranca", "ALTA - sem HSTS/CSP/XFO"],
-            ["05 DNS Audit", "10.99.0.13", "10 registros via AXFR", "CRITICA - Zone Transfer liberada"],
-            ["06 SMB Audit", "10.99.0.11", "Container SMB instavel", "NAO TESTADO"],
-            ["07 SNMP Audit", "10.99.0.14", "community 'public' acessivel", "ALTA - SNMP exposto"],
-            ["08 Password Audit", "10.99.0.10", "admin:admin, root:toor", "CRITICA - senhas fracas"],
-            ["09 SSL Audit", "10.99.0.10:443", "TLS 1.2/1.3, cert auto-assinado", "MEDIA - sem HSTS"],
-            ["10 Vuln Scan", "10.99.0.10", "NSE vuln/safe executados", "Baixo (servicos atualizados)"],
-            ["11 Firewall Audit", "10.99.0.10", "Policy ACCEPT, sem regras", "ALTA - sem firewall"],
-            ["12 Log Audit", "Container", "dpkg.log, alternativas.log", "Sem auth.log (container)"],
-            ["13 Config Audit", "Cisco", "4 falhas encontradas", "ALTA - senhas e SNMP"],
-            ["14 Traffic Analysis", "any", "tcpdump capturou ICMP", "N/A"],
-            ["15 WiFi Audit", "N/A", "Sem interface wifi", "NAO TESTADO"],
-            ["16 Vuln Assessment", "10.99.0.10", "OpenSSH/Apache vs CVEs", "Depende de searchsploit"],
-            ["17 Identity Audit", "10.99.0.12", "LDAP bind anonimo, SRV DNS", "MEDIA - bind anonimo"],
+            ["01 Host Discovery", "10.99.0.10", "Host descoberto via TCP SYN ping", "OK"],
+            ["02 Port Scan", "10.99.0.10", "4 portas abertas (21,22,80,443)", "OK"],
+            ["03 Service Enum", "10.99.0.10", "vsftpd, OpenSSH 8.4, Apache 2.4", "OK"],
+            ["04 Web Audit", "10.99.0.10", "Headers e diretorios analisados", "OK"],
+            ["05 DNS Audit", "10.99.0.13", "Registros DNS consultados", "OK"],
+            ["06 SMB Audit", "10.99.0.11", "Container SMB instavel", "EXIT(1)"],
+            ["07 SNMP Audit", "10.99.0.14", "Community strings testadas", "OK"],
+            ["08 Password Audit", "10.99.0.10", "Wordlist + SSH testados", "OK"],
+            ["09 SSL Audit", "10.99.0.10:443", "Cert auto-assinado (target.lab.local)", "EXIT(1)"],
+            ["10 Vuln Scan", "10.99.0.10", "NSE scripts + versoes detectadas", "OK"],
+            ["11 Firewall Audit", "10.99.0.10", "Perfil stateful identificado", "EXIT(1)"],
+            ["12 Log Audit", "host", "Log do sistema analisado", "OK"],
+            ["13 Config Audit", "simulada", "Configuracao simulada auditada", "OK"],
+            ["14 Traffic Analysis", "podman1", "Captura na bridge do lab", "OK"],
+            ["15 WiFi Audit", "N/A", "Sem interface wifi no host", "EXIT(1)"],
+            ["16 Vuln Assessment", "10.99.0.10", "Arquivo de servicos gerado", "OK"],
+            ["17 Identity Audit", "10.99.0.12", "LDAP bind anonimo, root DSE", "OK"],
         ]
+    )
+
+    pdf.subsecao("Como Reproduzir os Testes")
+    pdf.corpo(
+        "1. Subir o laboratorio:\n"
+        "     cd lab && sudo docker-compose up -d\n\n"
+        "2. Executar bateria completa:\n"
+        "     sudo bash lab/run_tests.sh\n\n"
+        "3. Atualizar evidencias nos READMEs:\n"
+        "     bash lab/update_readmes.sh\n\n"
+        "4. Output de cada modulo:\n"
+        "     audits/evidencias/XX-modulo.clean.log"
     )
 
     pdf.subsecao("Vulnerabilidades Criticas Encontradas")
     pdf.corpo(
-        "1. Zona DNS exposta via AXFR - todo o mapeamento da rede 10.99.0.x foi obtido\n"
-        "2. Credenciais administrativas fracas - SSH admin:admin e root:toor\n"
-        "3. SNMP com community 'public' - informacoes do sistema extraidas\n"
-        "4. Servidor web sem headers de seguranca - vulneravel a clickjacking/XSS\n"
-        "5. Ausencia de firewall - todas as portas acessiveis sem restricao"
+        "1. Certificado SSL auto-assinado (CN=target.lab.local) - sem validade\n"
+        "2. Servidor web rodando em porta 80/443 sem headers de seguranca\n"
+        "3. LDAP com bind anonimo permitido (root DSE exposto)\n"
+        "4. SNMP acessivel via community strings padrao\n"
+        "5. FTP vsftpd com configuracao insegura (secure_chroot_dir ausente)"
     )
 
     pdf.subsecao("Comandos Utilizados nos Testes")
     pdf.comando(
         "# Host Discovery\n"
-        "nmap -sn 10.99.0.0/24\n\n"
-        "# Port Scan Completo\n"
-        "nmap -p- --open 10.99.0.10\n\n"
+        "nmap -sn -PS80,443,22 --send-eth -e podman1 10.99.0.10\n\n"
+        "# Port Scan\n"
+        "nmap -sS --top-ports 100 --reason -T4 10.99.0.10\n\n"
         "# Enumeracao de Servicos\n"
-        "nmap -sV -p 22,80,443,21,3306 10.99.0.10\n\n"
+        "nmap -sV -p 21,22,80,443 10.99.0.10\n\n"
         "# Auditoria Web\n"
-        "curl -s -I http://10.99.0.10/\n"
-        "openssl s_client -connect 10.99.0.10:443\n\n"
+        "gobuster dir -u http://10.99.0.10/ -w /usr/share/wordlists/dirb/common.txt\n\n"
         "# Transferencia de Zona DNS\n"
-        "dig axfr lab.local @10.99.0.13\n\n"
+        "dig @10.99.0.13 lab.local ANY\n\n"
         "# Auditoria SNMP\n"
         "snmpwalk -v2c -c public 10.99.0.14 1.3.6.1.2.1.1.1.0\n\n"
         "# Teste de Senhas\n"
-        "sshpass -p 'admin' ssh admin@10.99.0.10\n\n"
+        "hydra -l admin -P wordlist.txt ssh://10.99.0.10\n\n"
         "# Firewall (ACK scan)\n"
         "nmap -sA -p 22,80,443 10.99.0.10\n\n"
         "# Analise de Trafego\n"
-        "tcpdump -i any -c 10 icmp\n\n"
+        "tcpdump -i podman1 -c 100\n\n"
         "# Auditoria de Identidade\n"
         "ldapsearch -x -H ldap://10.99.0.12:389 -b '' -s base"
     )
