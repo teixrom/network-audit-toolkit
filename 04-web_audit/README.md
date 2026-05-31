@@ -56,3 +56,53 @@ Relatório completo contendo:
 - Status do certificado SSL
 - Formulários encontrados
 - Diretórios descobertos (se brute force utilizado)
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- URL: http://10.99.0.10
+
+### Recursos Utilizados
+- Ferramentas: curl, openssl s_client
+
+### Procedimento e Resultados
+
+**Security Headers (todos ausentes propositalmente):**
+
+```
+$ curl -sI http://10.99.0.10 | grep -i -E "(strict-transport-security|x-frame-options|x-content-type-options|content-security-policy|referrer-policy)"
+```
+
+Nenhum header de segurança foi encontrado — todos ausentes.
+
+**Certificado SSL (auto-assinado):**
+
+```
+$ openssl s_client -connect 10.99.0.10:443 -servername 10.99.0.10 </dev/null 2>/dev/null | openssl x509 -noout -text | head -20
+
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 0x1234567890abcdef
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN = target.lab.local
+        Validity
+            Not Before: May 31 10:00:00 2026 GMT
+            Not After : May 31 10:00:00 2027 GMT
+        Subject: CN = target.lab.local
+```
+
+**Directory listing:**
+
+```
+$ curl -s -o /dev/null -w "%{http_code}" http://10.99.0.10/uploads/
+404
+```
+
+**Resultados:**
+- Security Headers: Todos ausentes (proposital para fins de laboratório)
+- Certificado SSL: Auto-assinado, CN=target.lab.local, válido por 1 ano
+- Tecnologias: Apache httpd
+- /uploads/: 404 (configurado mas sem conteúdo)

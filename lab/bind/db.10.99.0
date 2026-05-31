@@ -1,0 +1,15 @@
+$TTL 86400
+@   IN  SOA dns.lab.local. admin.lab.local. (
+        2025010101
+        3600
+        900
+        604800
+        86400
+)
+@   IN  NS  dns.lab.local.
+
+10  IN  PTR target.lab.local.
+11  IN  PTR smb.lab.local.
+12  IN  PTR ldap.lab.local.
+13  IN  PTR dns.lab.local.
+14  IN  PTR snmp.lab.local.

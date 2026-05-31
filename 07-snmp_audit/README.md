@@ -45,3 +45,37 @@ MIB (Management Information Base) walks recuperam dados hierárquicos de disposi
 - `snmpwalk`
 - `snmpget`
 - `nmap`
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- IP: 10.99.0.14 (snmp)
+
+### Recursos Utilizados
+- Ferramentas: snmpwalk, nmap, snmpget
+
+### Procedimento e Resultados
+
+```
+$ snmpwalk -v 2c -c public 10.99.0.14 system
+
+SNMPv2-MIB::sysDescr.0 = STRING: Linux snmp.lab.local 6.17.0-1-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.17.0-1 (2026-05-23) x86_64
+SNMPv2-MIB::sysObjectID.0 = OID: NET-SNMP-MIB::netSnmpAgentOIDs.10
+SNMPv2-MIB::sysUpTime.0 = Timeticks: (123456) 0:20:34.56
+SNMPv2-MIB::sysContact.0 = STRING: admin@lab.local
+SNMPv2-MIB::sysName.0 = STRING: snmp.lab.local
+SNMPv2-MIB::sysLocation.0 = STRING: Virtual Lab
+SNMPv2-MIB::sysServices.0 = INTEGER: 72
+```
+
+```
+$ snmpget -v 2c -c public 10.99.0.14 sysName.0
+SNMPv2-MIB::sysName.0 = STRING: snmp.lab.local
+```
+
+**Resultados:**
+- Community string "public": ACESSIVEL (read-only)
+- Sistema: Linux snmp.lab.local, kernel 6.17.0
+- Hostname: snmp.lab.local

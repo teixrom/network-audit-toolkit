@@ -22,3 +22,18 @@ sudo bash wifi_audit.sh
 - `iw`
 - `iwlist` ou `nmcli`
 - `root` (para modo monitor/scan)
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- N/A (sem interface Wi-Fi)
+
+### Recursos Utilizados
+- Ferramentas: iw, iwlist, iwconfig
+
+### Procedimento e Resultados
+Not tested: Nenhuma interface Wi-Fi disponivel no ambiente de laboratorio
+
+Em ambiente real: iwlist scan, iw dev detectariam APs vizinhos

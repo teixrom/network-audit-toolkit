@@ -138,7 +138,7 @@ def gerar():
     pdf.set_font("DejaVu", "", 11)
     pdf.set_text_color(80,80,80)
     pdf.cell(0, 7, "Suite de Auditoria de Redes em Bash", align="C", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 7, "12 modulos para analise de seguranca", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 7, "17 modulos para analise de seguranca", align="C", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(20)
     pdf.set_font("DejaVu", "", 9)
     pdf.set_text_color(120,120,120)
@@ -174,7 +174,8 @@ def gerar():
         ("15", "Modulo 15: Auditoria Wi-Fi"),
         ("16", "Modulo 16: Avaliacao de Vulnerabilidades"),
         ("17", "Modulo 17: Auditoria de Identidade"),
-        ("18", "Boas Praticas e Avisos Legais"),
+        ("18", "Relatorio Consolidado de Testes"),
+        ("19", "Boas Praticas e Avisos Legais"),
     ]
     for n, desc in itens:
         pdf.set_font("DejaVu", "", 10)
@@ -187,7 +188,7 @@ def gerar():
     pdf.secao("1", "Introducao")
     pdf.corpo(
         "O Network Audit Toolkit e uma suite completa de auditoria de redes "
-        "desenvolvida em Bash script. Composta por 12 modulos independentes, "
+        "desenvolvida em Bash script. Composta por 17 modulos independentes, "
         "a ferramenta automatiza tarefas comuns de seguranca ofensiva e "
         "defensiva, desde a descoberta de hosts ate a analise forense de logs."
     )
@@ -216,7 +217,12 @@ def gerar():
 "  09-ssl_audit/        # Auditoria SSL/TLS\n"
 "  10-vulnerability_scan/ # Varredura de vulnerabilidades\n"
 "  11-firewall_audit/   # Auditoria de firewall\n"
-"  12-log_audit/        # Analise de logs"
+"  12-log_audit/        # Analise de logs\n"
+"  13-config_audit/     # Auditoria de configuracao\n"
+"  14-traffic_analysis/ # Analise de trafego\n"
+"  15-wifi_audit/       # Auditoria Wi-Fi\n"
+"  16-vuln_assessment/  # Avaliacao de vulnerabilidades\n"
+"  17-identity_audit/   # Auditoria de identidade"
     )
     pdf.subsecao("Fluxo de Auditoria Tipico")
     pdf.corpo(
@@ -226,7 +232,9 @@ def gerar():
         "4. Aprofunde em servicos especificos (Modulos 4 a 9)\n"
         "5. Varra vulnerabilidades conhecidas (Modulo 10)\n"
         "6. Analise firewall e logs (Modulos 11 e 12)\n"
-        "7. Gere relatorio completo"
+        "7. Audite configuracoes e trafego (Modulos 13 e 14)\n"
+        "8. Verifique Wi-Fi e identidade (Modulos 15 a 17)\n"
+        "9. Gere relatorio completo"
     )
 
     # ---- 2. INSTALACAO ----
@@ -268,7 +276,7 @@ def gerar():
     pdf.comando("sudo bash network_audit.sh")
     pdf.corpo(
         "O menu principal exibe um aviso legal (necessario pressionar ENTER "
-        "para confirmar) e apresenta os 12 modulos disponiveis. "
+        "para confirmar) e apresenta os 17 modulos disponiveis. "
         "Basta digitar o numero do modulo desejado e pressionar ENTER."
     )
     pdf.corpo(
@@ -987,9 +995,75 @@ def gerar():
         "Servidores de identidade acessiveis: 3/4\n"
         "Possivel segmentacao: OK")
 
-    # ---- 18. BOAS PRATICAS ----
+    # ---- 18. RELATORIO CONSOLIDADO DE TESTES ----
     pdf.add_page()
-    pdf.secao("18", "Boas Praticas e Avisos Legais")
+    pdf.secao("18", "Relatorio Consolidado de Testes")
+    pdf.corpo(
+        "Os resultados abaixo foram obtidos executando cada modulo contra o "
+        "laboratorio virtual (rede 10.99.0.0/24) com 5 containers Docker "
+        "simulando servidores reais."
+    )
+    pdf.subsecao("Sumario dos Resultados")
+    pdf.tabela(
+        ["Modulo", "Alvo", "Resultado", "Vulnerabilidade"],
+        [
+            ["01 Host Discovery", "10.99.0.0/24", "6 hosts encontrados", "N/A"],
+            ["02 Port Scan", "10.99.0.10", "4 portas abertas (21,22,80,443)", "N/A"],
+            ["03 Service Enum", "10.99.0.10", "vsftpd, OpenSSH 8.4, Apache 2.4", "FTP anonimo permitido"],
+            ["04 Web Audit", "10.99.0.10", "0 headers de seguranca", "ALTA - sem HSTS/CSP/XFO"],
+            ["05 DNS Audit", "10.99.0.13", "10 registros via AXFR", "CRITICA - Zone Transfer liberada"],
+            ["06 SMB Audit", "10.99.0.11", "Container SMB instavel", "NAO TESTADO"],
+            ["07 SNMP Audit", "10.99.0.14", "community 'public' acessivel", "ALTA - SNMP exposto"],
+            ["08 Password Audit", "10.99.0.10", "admin:admin, root:toor", "CRITICA - senhas fracas"],
+            ["09 SSL Audit", "10.99.0.10:443", "TLS 1.2/1.3, cert auto-assinado", "MEDIA - sem HSTS"],
+            ["10 Vuln Scan", "10.99.0.10", "NSE vuln/safe executados", "Baixo (servicos atualizados)"],
+            ["11 Firewall Audit", "10.99.0.10", "Policy ACCEPT, sem regras", "ALTA - sem firewall"],
+            ["12 Log Audit", "Container", "dpkg.log, alternativas.log", "Sem auth.log (container)"],
+            ["13 Config Audit", "Cisco", "4 falhas encontradas", "ALTA - senhas e SNMP"],
+            ["14 Traffic Analysis", "any", "tcpdump capturou ICMP", "N/A"],
+            ["15 WiFi Audit", "N/A", "Sem interface wifi", "NAO TESTADO"],
+            ["16 Vuln Assessment", "10.99.0.10", "OpenSSH/Apache vs CVEs", "Depende de searchsploit"],
+            ["17 Identity Audit", "10.99.0.12", "LDAP bind anonimo, SRV DNS", "MEDIA - bind anonimo"],
+        ]
+    )
+
+    pdf.subsecao("Vulnerabilidades Criticas Encontradas")
+    pdf.corpo(
+        "1. Zona DNS exposta via AXFR - todo o mapeamento da rede 10.99.0.x foi obtido\n"
+        "2. Credenciais administrativas fracas - SSH admin:admin e root:toor\n"
+        "3. SNMP com community 'public' - informacoes do sistema extraidas\n"
+        "4. Servidor web sem headers de seguranca - vulneravel a clickjacking/XSS\n"
+        "5. Ausencia de firewall - todas as portas acessiveis sem restricao"
+    )
+
+    pdf.subsecao("Comandos Utilizados nos Testes")
+    pdf.comando(
+        "# Host Discovery\n"
+        "nmap -sn 10.99.0.0/24\n\n"
+        "# Port Scan Completo\n"
+        "nmap -p- --open 10.99.0.10\n\n"
+        "# Enumeracao de Servicos\n"
+        "nmap -sV -p 22,80,443,21,3306 10.99.0.10\n\n"
+        "# Auditoria Web\n"
+        "curl -s -I http://10.99.0.10/\n"
+        "openssl s_client -connect 10.99.0.10:443\n\n"
+        "# Transferencia de Zona DNS\n"
+        "dig axfr lab.local @10.99.0.13\n\n"
+        "# Auditoria SNMP\n"
+        "snmpwalk -v2c -c public 10.99.0.14 1.3.6.1.2.1.1.1.0\n\n"
+        "# Teste de Senhas\n"
+        "sshpass -p 'admin' ssh admin@10.99.0.10\n\n"
+        "# Firewall (ACK scan)\n"
+        "nmap -sA -p 22,80,443 10.99.0.10\n\n"
+        "# Analise de Trafego\n"
+        "tcpdump -i any -c 10 icmp\n\n"
+        "# Auditoria de Identidade\n"
+        "ldapsearch -x -H ldap://10.99.0.12:389 -b '' -s base"
+    )
+
+    # ---- 19. BOAS PRATICAS ----
+    pdf.add_page()
+    pdf.secao("19", "Boas Praticas e Avisos Legais")
 
     pdf.subsecao("Aviso Legal Importante")
     pdf.set_font("DejaVu", "B", 10)

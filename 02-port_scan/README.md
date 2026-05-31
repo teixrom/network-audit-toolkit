@@ -52,3 +52,71 @@ O script exibe uma tabela com:
 - Serviço associado (http, ssh, etc.)
 
 Resultados podem ser exportados para arquivo de texto e carregados posteriormente pelo módulo de enumeração de serviços.
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- IP: 10.99.0.10 (target)
+
+### Recursos Utilizados
+- Ferramentas: nmap (TCP Connect, SYN Stealth, UDP)
+
+### Procedimento e Resultados
+
+**TCP Connect Scan (-sT) e SYN Stealth Scan (-sS):**
+
+```
+$ nmap -p- --open 10.99.0.10
+
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-05-31 10:05 -03
+Nmap scan report for 10.99.0.10
+Host is up (0.0009s latency).
+Not shown: 65531 closed ports
+PORT    STATE SERVICE
+21/tcp  open  ftp
+22/tcp  open  ssh
+80/tcp  open  http
+443/tcp open  https
+
+Nmap done: 1 IP address (1 host up) scanned in 65.23s
+```
+
+```
+$ nmap -sS -T4 --top-ports 100 10.99.0.10
+
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-05-31 10:06 -03
+Nmap scan report for 10.99.0.10
+Host is up (0.0007s latency).
+PORT    STATE SERVICE
+21/tcp  open  ftp
+22/tcp  open  ssh
+80/tcp  open  http
+443/tcp open  https
+
+Nmap done: 1 IP address (1 host up) scanned in 4.52s
+```
+
+**UDP Scan:**
+
+```
+$ nmap -sU -T4 --top-ports 20 10.99.0.10
+
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-05-31 10:07 -03
+Nmap scan report for 10.99.0.10
+Host is up (0.0011s latency).
+PORT      STATE         SERVICE
+53/udp    open|filtered domain
+135/udp   open|filtered msrpc
+162/udp   open|filtered snmptrap
+520/udp   open|filtered route
+1900/udp  open|filtered upnp
+49152/udp open|filtered unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 20.18s
+```
+
+**Resultados:**
+- Portas TCP abertas: 21 (FTP), 22 (SSH), 80 (HTTP), 443 (HTTPS)
+- Portas UDP filtradas: 53, 135, 162, 520, 1900, 49152

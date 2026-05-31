@@ -348,7 +348,7 @@ main() {
     log "=== INICIO Avaliacao de Vulnerabilidades ==="
     show_banner "Avaliacao de Vulnerabilidades"
     show_disclaimer
-    check_deps "curl"
+    check_deps "curl" "python3"
 
     get_service_file
 

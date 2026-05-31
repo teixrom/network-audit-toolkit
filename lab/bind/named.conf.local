@@ -1,0 +1,11 @@
+zone "lab.local" {
+    type master;
+    file "/etc/bind/db.lab.local";
+    allow-transfer { any; };
+};
+
+zone "0.99.10.in-addr.arpa" {
+    type master;
+    file "/etc/bind/db.10.99.0";
+    allow-transfer { any; };
+};

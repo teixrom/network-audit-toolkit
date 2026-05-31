@@ -1,0 +1,92 @@
+version: "3.8"
+
+networks:
+  audit-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.99.0.0/24
+
+services:
+  target:
+    build:
+      context: .
+      dockerfile: Dockerfile.target
+    container_name: nat-target
+    hostname: target.lab.local
+    networks:
+      audit-net:
+        ipv4_address: 10.99.0.10
+    ports:
+      - "1022:22"
+      - "1080:80"
+      - "1443:443"
+      - "1021:21"
+      - "13306:3306"
+    cap_add:
+      - NET_ADMIN
+    privileged: false
+    restart: unless-stopped
+
+  smb:
+    image: docker.io/dperson/samba:latest
+    container_name: nat-smb
+    hostname: smb.lab.local
+    networks:
+      audit-net:
+        ipv4_address: 10.99.0.11
+    ports:
+      - "1445:445"
+      - "1139:139"
+    environment:
+      USER: "admin;secret123"
+      SHARE: "public;/share;yes;no;admin"
+      WORKGROUP: "LAB"
+    restart: unless-stopped
+
+  ldap:
+    image: docker.io/osixia/openldap:latest
+    container_name: nat-ldap
+    hostname: ldap.lab.local
+    networks:
+      audit-net:
+        ipv4_address: 10.99.0.12
+    ports:
+      - "1389:389"
+      - "1636:636"
+    environment:
+      LDAP_ORGANISATION: "LabCorp"
+      LDAP_DOMAIN: "lab.local"
+      LDAP_ADMIN_PASSWORD: "admin123"
+      LDAP_READONLY_USER: "true"
+      LDAP_READONLY_USER_USERNAME: "reader"
+      LDAP_READONLY_USER_PASSWORD: "reader123"
+    restart: unless-stopped
+
+  dns:
+    image: docker.io/internetsystemsconsortium/bind9:9.18
+    container_name: nat-dns
+    hostname: dns.lab.local
+    networks:
+      audit-net:
+        ipv4_address: 10.99.0.13
+    ports:
+      - "1053:53/udp"
+      - "1053:53/tcp"
+    volumes:
+      - ./bind/:/etc/bind/
+    restart: unless-stopped
+
+  snmp:
+    image: docker.io/polinux/snmpd:latest
+    container_name: nat-snmp
+    hostname: snmp.lab.local
+    networks:
+      audit-net:
+        ipv4_address: 10.99.0.14
+    ports:
+      - "1161:161/udp"
+    environment:
+      SNMPD_ROCOMMUNITY: "public"
+      SNMPD_RWCOMMUNITY: "private"
+    restart: unless-stopped

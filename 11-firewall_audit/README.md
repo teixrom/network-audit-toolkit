@@ -67,3 +67,29 @@ Relatório completo contendo:
 - Resultados de scans TCP/UDP
 - Testes avançados com fragmentação e spoofing
 - Fingerprint de SO
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- IP: 10.99.0.10 (target)
+
+### Recursos Utilizados
+- Ferramentas: nmap -sA, -sF, -sN, -sX; iptables; hping3
+
+### Procedimento e Resultados
+```
+nmap -sA 10.99.0.10
+```
+22/unfiltered, 80/unfiltered, 443/unfiltered (stateless)
+
+```
+nmap -sF 10.99.0.10
+```
+open|filtered (inconsistent - suggests stateful inspection)
+
+```
+iptables -L -n
+```
+Policy ACCEPT on all chains (no firewall rules)

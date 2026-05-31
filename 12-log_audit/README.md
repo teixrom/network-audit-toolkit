@@ -78,3 +78,24 @@ Relatório completo contendo:
 - Eventos de crash/restart de serviços
 - Portas em escuta e conexões ativas
 - Resumo de segurança com findings
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- Container: nat-target
+
+### Recursos Utilizados
+- Ferramentas: journalctl, grep, awk, ss/netstat
+
+### Procedimento e Resultados
+Logs analyzed:
+- /var/log/dpkg.log (48109 bytes)
+- /var/log/alternatives.log (4243 bytes)
+- /var/log/vsftpd.log (empty)
+
+No auth.log available (container sem syslog)
+
+### Observacao
+Em ambiente real com syslog, auth.log conteria tentativas de login

@@ -39,3 +39,55 @@ A descoberta de subdomínios tenta encontrar entradas DNS que podem expor superf
 - `dig` (dnsutils)
 - `host`
 - `nslookup`
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- IP: 10.99.0.13 (DNS server)
+- Domínio: lab.local
+
+### Recursos Utilizados
+- Ferramentas: dig, nslookup, host
+
+### Procedimento e Resultados
+
+**Transferencia de Zona (AXFR):**
+
+```
+$ dig axfr lab.local @10.99.0.13
+
+; <<>> DiG 9.18.28 <<>> axfr lab.local @10.99.0.13
+;; global options: +cmd
+lab.local.              3600    IN      SOA     dns.lab.local. admin.lab.local. 2026053101 3600 900 86400 3600
+lab.local.              3600    IN      NS      dns.lab.local.
+dns.lab.local.          3600    IN      A       10.99.0.13
+ldap.lab.local.         3600    IN      A       10.99.0.12
+smb.lab.local.          3600    IN      A       10.99.0.11
+snmp.lab.local.         3600    IN      A       10.99.0.14
+target.lab.local.       3600    IN      A       10.99.0.10
+_ldap._tcp.lab.local.   3600    IN      SRV     0 100 389 ldap.lab.local.
+_kerberos._tcp.lab.local. 3600  IN      SRV     0 100 88  ldap.lab.local.
+lab.local.              3600    IN      SOA     dns.lab.local. admin.lab.local. 2026053101 3600 900 86400 3600
+```
+
+**VULNERAVEL** — Transferencia de zona completa liberada.
+
+**Reverse DNS:**
+
+```
+$ dig -x 10.99.0.10 @10.99.0.13 +short
+target.lab.local.
+
+$ dig -x 10.99.0.11 @10.99.0.13 +short
+smb.lab.local.
+
+$ dig -x 10.99.0.12 @10.99.0.13 +short
+ldap.lab.local.
+```
+
+**Resultados:**
+- Zone Transfer (AXFR): VULNERAVEL — zona completa disponivel sem restricao
+- Registros encontrados: SOA, NS, A (dns, ldap, smb, snmp, target), SRV (_ldap, _kerberos)
+- Reverse DNS: target.lab.local, smb.lab.local, ldap.lab.local

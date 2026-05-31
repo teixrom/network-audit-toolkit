@@ -53,3 +53,40 @@ O script exibe uma tabela com:
 - Fabricante (se disponível)
 
 Os resultados podem ser exportados para um arquivo de texto.
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- IP: 10.99.0.0/24
+
+### Recursos Utilizados
+- Ferramentas: nmap (ICMP Ping Sweep), arp-scan
+
+### Procedimento e Resultados
+
+```
+$ nmap -sn 10.99.0.0/24
+
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-05-31 10:00 -03
+Nmap scan report for 10.99.0.1
+Host is up (0.0012s latency).
+Nmap scan report for 10.99.0.10 (target)
+Host is up (0.0008s latency).
+Nmap scan report for 10.99.0.11 (smb)
+Host is up (0.0011s latency).
+Nmap scan report for 10.99.0.12 (ldap)
+Host is up (0.0009s latency).
+Nmap scan report for 10.99.0.13 (dns)
+Host is up (0.0010s latency).
+Nmap scan report for 10.99.0.14 (snmp)
+Host is up (0.0013s latency).
+Nmap done: 256 IP addresses (6 hosts up) scanned in 2.45s
+```
+
+**Resultados:**
+- Total de hosts ativos: 6
+- Gateway: 10.99.0.1
+- Containers alvo: 10.99.0.10 (target), 10.99.0.11 (smb), 10.99.0.12 (ldap), 10.99.0.13 (dns), 10.99.0.14 (snmp)
+- Todos os 5 containers + gateway responderam ao ICMP

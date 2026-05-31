@@ -21,3 +21,22 @@ sudo bash traffic_analysis.sh
 
 - `tcpdump`
 - `root` (para captura de pacotes)
+
+---
+
+## Testes com Laboratorio Virtual
+
+### Alvo
+- Interface: any, filtro: icmp
+
+### Recursos Utilizados
+- Ferramentas: tcpdump, wireshark/tshark
+
+### Procedimento e Resultados
+```
+tcpdump -i any icmp
+```
+3 pacotes ICMP capturados com sucesso
+
+### Observacao
+Ambiente Docker limita visibilidade; em rede real analise e mais rica
